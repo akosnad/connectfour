@@ -1,0 +1,3 @@
+[submodule "libnadak"]
+	path = libnadak
+	url = ssh://cortex.itk.ppke.hu/home/flugi/proghazi/nadak/lib.git
