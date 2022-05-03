@@ -2,6 +2,7 @@
 #include "textbox.hpp"
 #include "button.hpp"
 #include "box.hpp"
+#include "field.hpp"
 
 #include <functional>
 #include <iostream>
@@ -30,11 +31,13 @@ public:
 
 class GameBox : public Box {
     Button *quit_button;
+    Field *field;
 public:
     GameBox(Container* parent,
             function<void()> on_quit
     ) : Box(parent, 0, 0, W, H) {
         quit_button = new Button(this, 24, 24, 100, 24, "Quit game", on_quit);
+        field = new Field(this, 200, 200);
     }
 };
 
