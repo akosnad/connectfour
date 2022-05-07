@@ -22,6 +22,7 @@ public:
             function<void()> on_start,
             function<void()> on_exit
     ) : Box(parent, 0, 0, W, H) {
+        _focus_on_hover = true;
         const string t =  "Connect Four by nadak";
         title = new TextBox(this, W / 2 - gout.twidth(t) / 2, 32, 250, t);
         new_game_button = new Button(this, W / 2 - 24, 100, 48, 24, "Start", on_start);
@@ -36,6 +37,7 @@ public:
     GameBox(Container* parent,
             function<void()> on_quit
     ) : Box(parent, 0, 0, W, H) {
+        _focus_on_hover = true;
         quit_button = new Button(this, 24, 24, 100, 24, "Quit game", on_quit);
         field = new Field(this, 200, 200);
     }

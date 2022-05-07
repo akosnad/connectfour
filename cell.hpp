@@ -4,14 +4,20 @@
 #include "widgets.hpp"
 #include <functional>
 
+enum class CellColor {
+    red, yellow,
+    unfilled
+};
+
 class Cell : public Widget {
-    int _state;
+    CellColor _color;
     std::function<void()> _on_click;
 public:
     Cell(Container* parent, int x, int y, int wh, std::function<void()> on_click);
     virtual void draw();
     virtual void handle(genv::event);
-    int get_state() const { return _state; }
+    CellColor get_color() const { return _color; }
+    void set_color(CellColor color) { _color = color; }
 };
 
 #endif
