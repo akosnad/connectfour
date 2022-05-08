@@ -10,12 +10,15 @@ class Field : public Widget, public Container {
     std::vector<std::vector<Cell*>> _cells;
     int _active_player;
     int _hovered_col;
+    std::function<void(int x, int y)> _on_try_drop;
 public:
-    Field(Container* parent, int x, int y);
+    Field(Container* parent, int x, int y, std::function<void(int, int)> on_try_drop);
     virtual void draw();
     virtual void handle(genv::event);
+
     void handle_click(int x, int y);
     int next_empty(int col);
+    void set_cell(int x, int y, CellColor);
 };
 
 #endif

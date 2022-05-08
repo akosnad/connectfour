@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <iostream>
+#include <sstream>
 
 using namespace genv;
 using namespace std;
@@ -13,12 +14,12 @@ using namespace std;
 static const int W = 800;
 static const int H = 600;
 
-class StartupBox : public Box {
+class MainMenu : public Box {
     TextBox* title;
     Button* new_game_button;
     Button* exit_button;
 public:
-    StartupBox(Container* parent,
+    MainMenu(Container* parent,
             function<void()> on_start,
             function<void()> on_exit
     ) : Box(parent, 0, 0, W, H) {
@@ -30,38 +31,70 @@ public:
     }
 };
 
-class GameBox : public Box {
+class Game : public Box {
     Button *quit_button;
     Field *field;
+    TextBox *status_text;
+    bool first_player;
 public:
-    GameBox(Container* parent,
+    Game(Container* parent,
             function<void()> on_quit
     ) : Box(parent, 0, 0, W, H) {
         _focus_on_hover = true;
         quit_button = new Button(this, 24, 24, 100, 24, "Quit game", on_quit);
-        field = new Field(this, 200, 200);
+        field = new Field(this, 200, 200, [this](int x, int y){ handle_cell_drop(x, y); });
+        status_text = new TextBox(this, 260, 24, 200, "");
+
+        first_player = true;
+        update_status();
+    }
+
+    inline void change_player() {
+        first_player = !first_player;
+        update_status();
+    }
+
+    inline CellColor player_color() {
+        if(first_player)
+            return CellColor::red;
+        return CellColor::yellow;
+    }
+
+    void handle_cell_drop(int x, int y) {
+        field->set_cell(x, y, player_color());
+        change_player();
+    }
+
+    void update_status() {
+        stringstream ss;
+        ss << "Current player: ";
+        if(first_player)
+            ss << "First";
+        else
+            ss << "Second";
+        status_text->set_text(ss.str());
     }
 };
 
 class MainWindow : public Window {
-    StartupBox *startup_box = nullptr;
-    Box *game_box = nullptr;
+    MainMenu *main_menu = nullptr;
+    Game *game = nullptr;
 
     void new_game() {
-        if(startup_box)
-            delete startup_box;
+        if(main_menu)
+            delete main_menu;
 
-        game_box = new GameBox(this, [this](){ main_menu();});
+        game = new Game(this, [this](){ show_main_menu();});
     }
-    void main_menu() {
-        if(game_box)
-            delete game_box;
+    void show_main_menu() {
+        if(game)
+            delete game;
 
-        startup_box = new StartupBox(this, [this](){ new_game(); }, [](){ exit(0); });
+        main_menu = new MainMenu(this, [this](){ new_game(); }, [](){ exit(0); });
     }
 public:
     MainWindow() : Window(W, H) {
-        main_menu();
+        show_main_menu();
     }
     void event_handler(event ev) {}
 };

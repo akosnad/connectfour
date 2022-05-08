@@ -5,13 +5,13 @@
 using namespace std;
 using namespace genv;
 
-static const int wh = 24;
+static const int wh = 36;
 static const int nx = 7;
 static const int ny = 6;
 
-Field::Field(Container* parent, int x, int y)
+Field::Field(Container* parent, int x, int y, function<void(int x, int y)> on_try_drop)
     : Widget(parent, x, y, wh * nx, wh * ny), Container(),
-    _active_player(0), _hovered_col(-1) {
+    _active_player(0), _hovered_col(-1), _on_try_drop(on_try_drop) {
         _focus_on_hover = true;
         for(int i = 0; i < ny; i++) {
             vector<Cell*> row;
@@ -22,24 +22,6 @@ Field::Field(Container* parent, int x, int y)
             }
             _cells.push_back(row);
         }
-}
-
-int Field::next_empty(int x) {
-    int y = -1;
-    for(int i = 0; i < ny; i++) {
-        if(_cells[i][x]->get_color() != CellColor::unfilled)
-            break;
-        y = i;
-    }
-    return y;
-}
-
-void Field::handle_click(int x, int y) {
-    int ne = next_empty(x);
-    if(ne == -1)
-        return;
-
-    _cells[ne][x]->set_color(CellColor::red);
 }
 
 void Field::draw() {
@@ -59,3 +41,26 @@ void Field::handle(event ev) {
     handle_children_events(ev);
 }
 
+
+
+int Field::next_empty(int cx) {
+    int cy = -1;
+    for(int i = 0; i < ny; i++) {
+        if(_cells[i][cx]->get_color() != CellColor::unfilled)
+            break;
+        cy = i;
+    }
+    return cy;
+}
+
+void Field::handle_click(int cx, int cy) {
+    int ne = next_empty(cx);
+    if(ne == -1)
+        return;
+
+    _on_try_drop(cx, ne);
+}
+
+void Field::set_cell(int cx, int cy, CellColor color) {
+    _cells[cy][cx]->set_color(color);
+}
