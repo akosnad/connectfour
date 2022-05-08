@@ -32,13 +32,14 @@ bool Game::find_game_end_condition(int last_x, int last_y) {
     if(placed_so_far >= 7 * 6) {
         draw = true;
     } else {
+        const int y_start = last_y - 3 > 0 ? last_y - 3 : 0;
+        const int y_end   = last_y + 4 < 6 ? last_y + 4 : 6;
+        const int x_start = last_x - 3 > 0 ? last_x - 3 : 0;
+        const int x_end   = last_x + 4 < 7 ? last_x + 4 : 7;
+
         // horizontal
-        int y_start = last_y - 3 > 0 ? last_y - 3 : 0;
-        int y_end   = last_y + 3 < 6 ? last_y + 3 : 6;
         for(int y = y_start; y < y_end; y++) {
             int count = 0;
-            int x_start = last_x - 3 > 0 ? last_x - 3 : 0;
-            int x_end   = last_x + 3 < 7 ? last_x + 3 : 7;
             for(int x = x_start; x < x_end; x++) {
                 if(field->get_cell(x, y) == player_color())
                     count++;
@@ -49,6 +50,21 @@ bool Game::find_game_end_condition(int last_x, int last_y) {
                 }
             }
         }
+
+        //vertical
+        for(int x = x_start; x < x_end; x++) {
+            int count = 0;
+            for(int y = y_start; y < y_end; y++) {
+                if(field->get_cell(x, y) == player_color())
+                    count++;
+                if(count >= 4) {
+                    won = true;
+                    update_status();
+                    return true;
+                }
+            }
+        }
+
     }
     return false;
 }
