@@ -2,11 +2,9 @@
 #include "textbox.hpp"
 #include "button.hpp"
 #include "box.hpp"
-#include "field.hpp"
+#include "game.hpp"
 
 #include <functional>
-#include <iostream>
-#include <sstream>
 
 using namespace genv;
 using namespace std;
@@ -31,51 +29,6 @@ public:
     }
 };
 
-class Game : public Box {
-    Button *quit_button;
-    Field *field;
-    TextBox *status_text;
-    bool first_player;
-public:
-    Game(Container* parent,
-            function<void()> on_quit
-    ) : Box(parent, 0, 0, W, H) {
-        _focus_on_hover = true;
-        quit_button = new Button(this, 24, 24, 100, 24, "Quit game", on_quit);
-        field = new Field(this, 200, 200, [this](int x, int y){ handle_cell_drop(x, y); });
-        status_text = new TextBox(this, 260, 24, 200, "");
-
-        first_player = true;
-        update_status();
-    }
-
-    inline void change_player() {
-        first_player = !first_player;
-        update_status();
-    }
-
-    inline CellColor player_color() {
-        if(first_player)
-            return CellColor::red;
-        return CellColor::yellow;
-    }
-
-    void handle_cell_drop(int x, int y) {
-        field->set_cell(x, y, player_color());
-        change_player();
-    }
-
-    void update_status() {
-        stringstream ss;
-        ss << "Current player: ";
-        if(first_player)
-            ss << "First";
-        else
-            ss << "Second";
-        status_text->set_text(ss.str());
-    }
-};
-
 class MainWindow : public Window {
     MainMenu *main_menu = nullptr;
     Game *game = nullptr;
@@ -84,7 +37,7 @@ class MainWindow : public Window {
         if(main_menu)
             delete main_menu;
 
-        game = new Game(this, [this](){ show_main_menu();});
+        game = new Game(this, 0, 0, W, H, [this](){ show_main_menu();});
     }
     void show_main_menu() {
         if(game)

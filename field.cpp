@@ -64,3 +64,7 @@ void Field::handle_click(int cx, int cy) {
 void Field::set_cell(int cx, int cy, CellColor color) {
     _cells[cy][cx]->set_color(color);
 }
+
+CellColor Field::get_cell(int cx, int cy) const {
+    return _cells[cy][cx]->get_color();
+}

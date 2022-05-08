@@ -19,6 +19,7 @@ public:
     void handle_click(int x, int y);
     int next_empty(int col);
     void set_cell(int x, int y, CellColor);
+    CellColor get_cell(int x, int y) const;
 };
 
 #endif
