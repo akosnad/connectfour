@@ -6,6 +6,10 @@
 #include "cell.hpp"
 #include <vector>
 
+const int WH = 36;
+const int NX = 7;
+const int NY = 6;
+
 class Field : public Widget, public Container {
     std::vector<std::vector<Cell*>> _cells;
     int _active_player;

@@ -31,40 +31,46 @@ void Game::handle_cell_drop(int x, int y) {
 bool Game::find_game_end_condition(int last_x, int last_y) {
     if(placed_so_far >= 7 * 6) {
         draw = true;
-    } else {
-        const int y_start = last_y - 3 > 0 ? last_y - 3 : 0;
-        const int y_end   = last_y + 4 < 6 ? last_y + 4 : 6;
-        const int x_start = last_x - 3 > 0 ? last_x - 3 : 0;
-        const int x_end   = last_x + 4 < 7 ? last_x + 4 : 7;
+    } else if(check_matching_cells(last_x, last_y)) {
+        won = true;
+        update_status();
+    }
+    return won || draw;
+}
 
-        // horizontal
-        for(int y = y_start; y < y_end; y++) {
-            int count = 0;
-            for(int x = x_start; x < x_end; x++) {
-                if(field->get_cell(x, y) == player_color())
-                    count++;
-                if(count >= 4) {
-                    won = true;
-                    update_status();
-                    return true;
-                }
+bool Game::check_matching_cells(int x, int y) {
+    return check_matching_cells_inner(x, y, 8, 0)       // horizontal
+        || check_matching_cells_inner(x, y, 0, 8)       // vertical
+        || check_matching_cells_inner(x, y, 8, 8)       // diagonal right-down
+        || check_matching_cells_inner(x, y, 8, -8)      // diagonal right-up
+        ;
+}
+
+bool Game::check_matching_cells_inner(int x, int y, int sx, int sy) {
+    int dx = sx == 0 ? 0 : abs(sx) / sx;
+    int dy = sy == 0 ? 0 : abs(sy) / sy;
+
+    int x_start = x - sx / 2;
+    int y_start = y - sy / 2;
+
+    int count = 0;
+    bool match = false;
+    CellColor curr = player_color();
+
+    for(int i = 0, j = 0; i <= abs(sx) && j <= abs(sy); i+=abs(dx), j+=abs(dy)) {
+        int cx = x_start + i * dx;
+        int cy = y_start + j * dy;
+        if(cx >= 0 && cy >= 0 && cx < NX && cy < NY) {
+            CellColor cell = field->get_cell(cx, cy);
+            if(match && curr != cell) {
+                match = false;
+                count = 0;
+            } else if(curr == cell) {
+                match = true;
+                count++;
+                if(count == 4) return true;
             }
         }
-
-        //vertical
-        for(int x = x_start; x < x_end; x++) {
-            int count = 0;
-            for(int y = y_start; y < y_end; y++) {
-                if(field->get_cell(x, y) == player_color())
-                    count++;
-                if(count >= 4) {
-                    won = true;
-                    update_status();
-                    return true;
-                }
-            }
-        }
-
     }
     return false;
 }
