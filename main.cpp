@@ -9,8 +9,8 @@
 using namespace genv;
 using namespace std;
 
-static const int W = 800;
-static const int H = 600;
+static const int W = 400;
+static const int H = 400;
 
 class MainMenu : public Box {
     TextBox* title;

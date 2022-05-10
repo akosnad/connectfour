@@ -2,14 +2,21 @@
 #include <sstream>
 
 using namespace std;
+using namespace genv;
+
+const int GAP = 24;
+const int FIELD_X = 24;
+const int FIELD_Y = 100;
 
 Game::Game(Container* parent, int x, int y, int w, int h,
         function<void()> on_quit
 ) : Box(parent, x, y, w, h) {
     _focus_on_hover = true;
-    quit_button = new Button(this, 24, 24, 100, 24, "Quit game", on_quit);
-    field = new Field(this, 200, 200, [this](int x, int y){ handle_cell_drop(x, y); });
-    status_text = new TextBox(this, 260, 24, 200, "");
+    quit_button = new Button(this, GAP, GAP, 100, 24, "Quit game", on_quit);
+    field = new Field(this, FIELD_X, FIELD_Y, [this](int x, int y){ handle_cell_drop(x, y); });
+    hovering_cell = new Sprite(this, FIELD_X, FIELD_Y - WH, WH, WH);
+    hovering_cell->load_from_bitmap("./assets/d_red.bmp");
+    status_text = new TextBox(this, GAP, FIELD_Y + WH * NY + GAP, 200, "");
 
     first_player = true;
     won = false;
@@ -27,6 +34,16 @@ void Game::handle_cell_drop(int x, int y) {
     if(!find_game_end_condition(x, y))
         change_player();
 }
+
+void Game::change_player() {
+    first_player = !first_player;
+    update_status();
+    if(first_player)
+        hovering_cell->load_from_bitmap("./assets/d_red.bmp");
+    else
+        hovering_cell->load_from_bitmap("./assets/d_yellow.bmp");
+}
+
 
 bool Game::find_game_end_condition(int last_x, int last_y) {
     if(placed_so_far >= 7 * 6) {
@@ -91,4 +108,13 @@ void Game::update_status() {
     }
 
     status_text->set_text(ss.str());
+}
+
+void Game::handle(event ev) {
+    if(ev.type == ev_mouse) {
+        int col = (ev.pos_x - FIELD_X) / WH;
+        if(col >= 0 && col < NX)
+            hovering_cell->move(FIELD_X + col * WH, FIELD_Y - WH);
+    }
+    handle_children_events(ev);
 }

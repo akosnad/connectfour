@@ -7,7 +7,7 @@ using namespace genv;
 
 Field::Field(Container* parent, int x, int y, function<void(int x, int y)> on_try_drop)
     : Widget(parent, x, y, WH * NX, WH * NY), Container(),
-    _active_player(0), _hovered_col(-1), _on_try_drop(on_try_drop) {
+    _on_try_drop(on_try_drop) {
         _focus_on_hover = true;
         for(int i = 0; i < NY; i++) {
             vector<Cell*> row;
@@ -21,19 +21,10 @@ Field::Field(Container* parent, int x, int y, function<void(int x, int y)> on_tr
 }
 
 void Field::draw() {
-    if(_hovered_col >= 0) {
-        gout << color(255, 255, 255) << move_to(_x + _hovered_col * WH, _y - WH) << box(WH, WH);
-    }
     draw_children();
 }
 
 void Field::handle(event ev) {
-    if(ev.type == ev_mouse) {
-        if(is_selected(ev))
-            _hovered_col = (ev.pos_x - _x) / WH;
-        else
-            _hovered_col = -1;
-    }
     handle_children_events(ev);
 }
 
