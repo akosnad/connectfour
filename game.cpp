@@ -50,8 +50,8 @@ bool Game::find_game_end_condition(int last_x, int last_y) {
         draw = true;
     } else if(check_matching_cells(last_x, last_y)) {
         won = true;
-        update_status();
     }
+    update_status();
     return won || draw;
 }
 
