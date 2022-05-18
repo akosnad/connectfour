@@ -49,7 +49,6 @@ public:
     MainWindow() : Window(W, H) {
         show_main_menu();
     }
-    void event_handler(event ev) {}
 };
 
 int main() {
